@@ -10,6 +10,7 @@ const allowedOrigins = [
   "http://localhost:3000",          // CRA dev (if used)
   "http://localhost:5173",          // Vite dev
   "https://retaillogs.onrender.com",  // replace with your Render frontend URL
+  "https://retaillog.onrender.com",  // replace with your Render frontend URL
   // add any other allowed origins here
 ];
 
