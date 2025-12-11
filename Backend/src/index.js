@@ -6,7 +6,13 @@ const { initializeDatabase } = require('./controllers/salesController');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Middleware - Enhanced CORS configuration
+const allowedOrigins = [
+  "http://localhost:3000",          // CRA dev (if used)
+  "http://localhost:5173",          // Vite dev
+  "https://retaillogs.onrender.com",  // replace with your Render frontend URL
+  // add any other allowed origins here
+];
+
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? process.env.FRONTEND_URL 
@@ -16,6 +22,16 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200
 };
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin like curl, mobile apps, server-to-server
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('CORS Not Allowed: ' + origin));
+  },
+  credentials: true // if you use cookies/auth, keep this; otherwise set false
+}));
 
 app.use(cors(corsOptions));
 app.use(express.json());

@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Get API base URL from environment variable or use default
 const API_BASE_URL = "https://retailstore-tu67.onrender.com/api";
 
 // Create axios instance with default config
@@ -12,22 +11,17 @@ const api = axios.create({
   },
 });
 
-// Request interceptor for logging
+// Logging and interceptors (same as yours)
 api.interceptors.request.use(
   (config) => {
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
+    console.log('API Request:', config.method?.toUpperCase(), config.url, 'base:', API_BASE_URL);
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     console.error('API Error:', error.message);
     if (error.response) {
@@ -43,11 +37,7 @@ api.interceptors.response.use(
   }
 );
 
-/**
- * Get transactions with search, filter, sort, and pagination
- * @param {Object} params - Query parameters
- * @returns {Promise<Object>} - Response data
- */
+// your exported functions
 export const getTransactions = async (params) => {
   try {
     const response = await api.get('/transactions', { params });
@@ -58,10 +48,6 @@ export const getTransactions = async (params) => {
   }
 };
 
-/**
- * Get available filter options
- * @returns {Promise<Object>} - Filter options
- */
 export const getFilterOptions = async () => {
   try {
     const response = await api.get('/filter-options');
@@ -72,11 +58,6 @@ export const getFilterOptions = async () => {
   }
 };
 
-/**
- * Get statistics
- * @param {Object} params - Query parameters
- * @returns {Promise<Object>} - Statistics data
- */
 export const getStats = async (params) => {
   try {
     const response = await api.get('/stats', { params });
