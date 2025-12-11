@@ -4,7 +4,7 @@ const salesRoutes = require('./routes/salesRoutes');
 const { initializeDatabase } = require('./controllers/salesController');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 // Middleware - Enhanced CORS configuration
 const corsOptions = {
