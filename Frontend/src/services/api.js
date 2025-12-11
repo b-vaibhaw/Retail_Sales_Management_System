@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API base URL from environment variable or use default
-const API_BASE_URL = "http://localhost:10000/api";
+const API_BASE_URL = "https://retailstore-tu67.onrender.com/api";
 
 // Create axios instance with default config
 const api = axios.create({
