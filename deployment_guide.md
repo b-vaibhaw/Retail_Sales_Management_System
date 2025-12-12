@@ -262,4 +262,6 @@ app.use(cors());
 * For real use, move to PostgreSQL
 * Frontend must be rebuilt when backend URL changes
 
+# Currently there is a bug in frontend-(facing issue on frontend website during data loading)
+
 Just say **"Generate README"** or **"Generate architecture.md"**.
