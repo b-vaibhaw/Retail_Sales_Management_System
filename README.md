@@ -6,7 +6,7 @@ A full-stack web application for managing retail sales data with advanced search
 ## Tech Stack
 - **Frontend**: React 18, Vite, Axios, CSS3
 - **Backend**: Node.js, Express.js
-- **Deployment**: Vercel (frontend), Render/Railway (backend)
+- **Deployment**: Render (frontend), Render (backend)
 
 ## Search Implementation Summary
 Implements case-insensitive full-text search on customer name and phone number fields using JavaScript string matching. Search is debounced on the client-side (300ms delay) to reduce unnecessary API calls. The backend filters data in memory using `toLowerCase()` and `includes()` methods for accurate, performant results that work seamlessly alongside active filters and sorting.
