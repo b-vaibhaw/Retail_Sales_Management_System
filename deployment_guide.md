@@ -1,291 +1,265 @@
-# Deployment Guide - TruEstate Sales Management System
+# **Deployment Guide — TruEstate Retail Sales Management System**
 
-## Quick Deployment Checklist
-- [ ] Backend deployed and URL obtained
-- [ ] Frontend environment variable updated with backend URL
-- [ ] Frontend deployed
-- [ ] Both apps tested and working
-- [ ] GitHub repository created and pushed
-- [ ] README updated with live URLs
+This document explains how to deploy the **Retail Sales Management System** (Backend + Frontend) to the cloud using **Render**. It covers environment setup, build steps, SQLite handling, API configuration, and post-deployment validation.
 
----
 
-## Option 1: Deploy Backend to Render (Recommended)
+# **1. Overview**
 
-### Step 1: Prepare Your Code
-1. Ensure `backend/data/sales.json` exists with your dataset
-2. Commit all changes to Git
+The project contains:
 
-### Step 2: Deploy to Render
-1. Go to [render.com](https://render.com) and sign up/login
-2. Click "New +" → "Web Service"
-3. Connect your GitHub repository
-4. Configure:
-   - **Name**: `truestate-backend`
-   - **Root Directory**: `backend`
-   - **Environment**: `Node`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Plan**: Free
+* **Backend** — Node.js + Express + SQLite
+* **Frontend** — React (Vite)
+* **Monorepo layout** with separate folders
+* **Public API endpoints** used by the frontend
 
-5. Click "Create Web Service"
-6. Wait 2-3 minutes for deployment
-7. Copy your backend URL (e.g., `https://truestate-backend.onrender.com`)
+This guide documents the exact steps required to deploy both services on **Render**.
 
-### Important Notes for Render:
-- Free tier sleeps after 15 mins of inactivity (first request may be slow)
-- Add `/api/health` to check if backend is running
 
----
+# **2. Deployment Architecture**
 
-## Option 2: Deploy Backend to Railway
-
-### Step 1: Deploy to Railway
-1. Go to [railway.app](https://railway.app) and login
-2. Click "New Project" → "Deploy from GitHub repo"
-3. Select your repository
-4. Railway auto-detects Node.js
-5. Add these settings:
-   - **Root Directory**: `/backend`
-   - **Start Command**: `npm start`
-6. Click "Deploy"
-7. Go to Settings → Generate Domain
-8. Copy your backend URL
-
----
-
-## Deploy Frontend to Vercel
-
-### Step 1: Update Environment Variable
-Before deploying, create `frontend/.env.production`:
 ```
-VITE_API_URL=https://your-backend-url.onrender.com/api
+Render Cloud
+│
+├── Backend Web Service (Node.js)
+│     • Runs Express server
+│     • Serves /api/* endpoints
+│     • Loads SQLite database at runtime
+│     • Exposes a public HTTPS endpoint
+│
+└── Frontend Static Site (React + Vite)
+      • Deployed as static build
+      • Environment variable: VITE_API_URL = backend URL
+      • Communicates with backend only via HTTPS
 ```
 
-### Step 2: Deploy to Vercel
-1. Go to [vercel.com](https://vercel.com) and login
-2. Click "Add New" → "Project"
-3. Import your GitHub repository
-4. Configure:
-   - **Framework Preset**: Vite
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-   - **Install Command**: `npm install`
 
-5. Add Environment Variable:
-   - **Key**: `VITE_API_URL`
-   - **Value**: `https://your-backend-url.onrender.com/api`
+# **3. Backend Deployment (Render Web Service)**
 
-6. Click "Deploy"
-7. Wait 1-2 minutes
-8. Copy your frontend URL (e.g., `https://truestate-sales.vercel.app`)
+### **3.1 Requirements**
 
----
+* Node.js 18+
+* SQLite database file inside:
 
-## Option 2: Deploy Frontend to Netlify
+  ```
+  /backend/data/truestate.db
+  ```
 
-1. Go to [netlify.com](https://netlify.com) and login
-2. Click "Add new site" → "Import an existing project"
-3. Connect to GitHub and select your repo
-4. Configure:
-   - **Base directory**: `frontend`
-   - **Build command**: `npm run build`
-   - **Publish directory**: `frontend/dist`
+### **3.2 Repository Path**
 
-5. Add Environment Variable:
-   - **Key**: `VITE_API_URL`
-   - **Value**: `https://your-backend-url.onrender.com/api`
-
-6. Click "Deploy site"
-
----
-
-## Testing Your Deployment
-
-### Test Backend
-```bash
-# Health check
-curl https://your-backend-url.onrender.com/health
-
-# Get filter options
-curl https://your-backend-url.onrender.com/api/filter-options
-
-# Get transactions
-curl https://your-backend-url.onrender.com/api/transactions?page=1&limit=10
+```
+root/backend
 ```
 
-### Test Frontend
-1. Open your frontend URL in browser
-2. Check if data loads
-3. Test search functionality
-4. Test filters
-5. Test sorting
-6. Test pagination
-7. Check browser console for errors
+### **3.3 Start Command**
 
----
+In Render → **Build Command**:
 
-## Common Issues & Solutions
-
-### Issue 1: "Failed to fetch" error in frontend
-**Solution**: Check CORS is enabled in backend and `VITE_API_URL` is set correctly
-
-### Issue 2: Backend returns 500 error
-**Solution**: Check backend logs on Render/Railway dashboard. Likely missing `sales.json` file
-
-### Issue 3: Data not loading
-**Solution**: 
-- Verify backend URL is correct with `/api` suffix
-- Check Network tab in browser DevTools
-- Ensure backend is awake (Render free tier sleeps)
-
-### Issue 4: Blank page on frontend
-**Solution**:
-- Check browser console for errors
-- Verify all files are committed to Git
-- Check Vercel/Netlify build logs
-
----
-
-## Environment Variables Summary
-
-### Backend (.env) - Optional
 ```
-PORT=5000
-NODE_ENV=production
+npm install
 ```
 
-### Frontend (.env.production)
+**Start Command:**
+
 ```
-VITE_API_URL=https://your-backend-url.onrender.com/api
-```
-
----
-
-## GitHub Repository Setup
-
-### Create Repository
-```bash
-# Initialize git (if not already)
-git init
-
-# Add all files
-git add .
-
-# Commit
-git commit -m "Initial commit - TruEstate Sales Management System"
-
-# Create GitHub repo (on github.com)
-# Then link and push:
-git remote add origin https://github.com/yourusername/truestate-assignment.git
-git branch -M main
-git push -u origin main
+npm run dev
 ```
 
-### Repository Checklist
-- [ ] All code files committed
-- [ ] `.gitignore` properly configured
-- [ ] `README.md` updated with live URLs
-- [ ] `docs/architecture.md` included
-- [ ] Repository is public
+or (recommended in production):
 
----
-
-## Final Submission Checklist
-
-### 1. Live Application URL ✅
-- Frontend URL: `https://your-app.vercel.app`
-- Test all features work
-
-### 2. GitHub Repository URL ✅
-- Repository: `https://github.com/yourusername/truestate-assignment`
-- Ensure it's public
-
-### 3. README.md Format ✅
-Must contain:
-1. Overview (3-5 lines)
-2. Tech Stack
-3. Search Implementation Summary
-4. Filter Implementation Summary
-5. Sorting Implementation Summary
-6. Pagination Implementation Summary
-7. Setup Instructions
-
-### 4. Architecture Document ✅
-Located at: `/docs/architecture.md`
-Must contain:
-- Backend architecture
-- Frontend architecture
-- Data flow
-- Folder structure
-- Module responsibilities
-
----
-
-## Performance Tips
-
-1. **Enable Compression**: Add compression middleware to Express
-2. **Optimize Images**: Use optimized images/icons
-3. **Lazy Loading**: Consider React.lazy for components
-4. **Caching**: Add caching headers in production
-5. **Minification**: Ensure production builds are minified
-
----
-
-## Monitoring Your App
-
-### Backend Logs (Render)
-1. Go to Render dashboard
-2. Click your service
-3. Click "Logs" tab
-4. Monitor for errors
-
-### Frontend Errors
-1. Open browser DevTools (F12)
-2. Check Console tab
-3. Check Network tab for failed requests
-
----
-
-## Quick Deploy Commands
-
-### Deploy Backend (if using Render CLI)
-```bash
-cd backend
-render-cli deploy
+```
+node src/index.js
 ```
 
-### Deploy Frontend (if using Vercel CLI)
-```bash
-cd frontend
-vercel --prod
+### **3.4 Environment Variables**
+
+Add in Render dashboard:
+
+| KEY      | VALUE                    |
+| -------- | ------------------------ |
+| PORT     | 10000 (or leave default) |
+| NODE_ENV | production               |
+
+### **3.5 SQLite Considerations**
+
+* SQLite file must be inside repository
+* Path must work on Render’s ephemeral filesystem
+* Recommended location:
+
+```
+backend/data/truestate.db
+```
+
+Backend logs will confirm:
+
+```
+SQLite database initialized
+```
+
+
+# **4. Frontend Deployment (Render Static Site)**
+
+### **4.1 Repository Path**
+
+```
+root/frontend
+```
+
+### **4.2 Build Command**
+
+```
+npm install && npm run build
+```
+
+### **4.3 Publish Directory**
+
+```
+dist
+```
+
+### **4.4 Environment Variables**
+
+You **must** set the backend URL so the React app knows where to send API requests:
+
+```
+VITE_API_URL = https://<your-backend-service>.onrender.com
+```
+
+This is used in:
+
+```
+frontend/src/services/api.js
+```
+
+### **4.5 Required Code in api.js**
+
+Example (final working format):
+
+```js
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+export async function getTransactions(params) {
+  const res = await api.get("/api/transactions", { params });
+  return res.data;
+}
+
+export async function getFilterOptions() {
+  const res = await api.get("/api/filter-options");
+  return res.data;
+}
+```
+
+
+# **5. Connecting Frontend → Backend**
+
+After both services deploy:
+
+1. Go to **Render Backend URL**, example:
+
+   ```
+   https://retail-backend.onrender.com
+   ```
+2. Append endpoints to verify:
+
+   ```
+   /api/transactions
+   /api/filter-options
+   ```
+3. Confirm **CORS is enabled** in backend `index.js`:
+
+```js
+import cors from "cors";
+app.use(cors());
+```
+
+4. In frontend logs, confirm requests look like:
+
+```
+GET https://retail-backend.onrender.com/api/transactions
 ```
 
 ---
 
-## Support
+# **6. Troubleshooting**
 
-If you encounter issues:
-1. Check deployment logs
-2. Verify environment variables
-3. Test backend API directly with curl
-4. Check browser console
-5. Review CORS settings
+### **6.1 Frontend shows no data**
 
----
+* Check Network tab → Request URL must begin with backend URL
+* Ensure VITE_API_URL is set correctly
+* Confirm backend returns JSON
+* Mixed-content error → Ensure backend is HTTPS
 
-## Success Indicators
+### **6.2 Backend returns 404**
 
-✅ Backend health endpoint returns 200
-✅ Frontend loads without errors
-✅ Search functionality works
-✅ All filters apply correctly
-✅ Sorting changes data order
-✅ Pagination navigates between pages
-✅ No console errors
-✅ Responsive design works on mobile
+Ensure routes exist:
 
----
+```
+/api/transactions
+/api/filter-options
+```
 
-Good luck with your deployment! 🚀
+### **6.3 SQLite not loading on Render**
+
+Verify path in backend logs:
+
+```
+backend/data/truestate.db
+```
+
+### **6.4 CORS errors**
+
+Add in backend:
+
+```js
+app.use(cors());
+```
+
+
+# **7. Deployment Verification Checklist**
+
+### **Backend**
+
+✔ Server starts on Render
+✔ SQLite initialized
+✔ `/api/transactions` works
+✔ `/api/filter-options` works
+✔ CORS enabled
+
+### **Frontend**
+
+✔ Renders UI
+✔ API calls hit backend
+✔ Search works
+✔ Filters work
+✔ Sorting works
+✔ Pagination (10 per page) works
+
+
+# **8. Final Deliverables for Submission**
+
+| Deliverable              | Description                            |
+| ------------------------ | -------------------------------------- |
+| **Live Frontend URL**    | Render Static Site                     |
+| **Live Backend URL**     | Render Web Service                     |
+| **GitHub Repo**          | Full project with monorepo structure   |
+| **README.md**            | Follows assignment’s required sections |
+| **docs/architecture.md** | Architecture, flow, folder structure   |
+| **docs/Deployment.md**   | (this file)                            |
+
+
+# **9. Notes**
+
+* Render filesystem is ephemeral → SQLite works but cannot persist writes across deploys
+* For real use, move to PostgreSQL
+* Frontend must be rebuilt when backend URL changes
+
+Just say **"Generate README"** or **"Generate architecture.md"**.
